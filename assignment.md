@@ -43,12 +43,7 @@ Run the given command in your Linux terminal to download the project files:
 ```bash
 https://github.com/sakshirathoree/microservices-k8s.git
 ```
-## Step 3: Clone the source code of the project
-Run the given command in your Linux terminal to download the project files:
 
-```bash
-https://github.com/sakshirathoree/reddit-clone-k8s-ingress.git
-```
 ## Step 4: Move to the project directory & Build the Dockerfile
 The project folder includes a Dockerfile that will be used to build the image.
 
@@ -71,7 +66,7 @@ Run the below-given commands inside the root of the project folder to build the 
 ```
 docker build --rm -t <username>/microservicesflaskapp:latest .
 ```
-The --rm flag ensures that any intermediate containers created during the build process will be automatically removed once the build is finished, helping to maintain a cleaner development environment.
+**The --rm flag ensures that any intermediate containers created during the build process will be automatically removed once the build is finished, helping to maintain a cleaner development environment.**
 
 Use the command `docker images` to view your newly built image.
 
@@ -95,7 +90,7 @@ After building the image, we need to push it to docker hub, our Kubernetes deplo
 Congrats on reaching here! 🥳 You have now successfully built a docker image and uploaded it to Docker Hub, thus completing the basic steps of the continuous integration Process.
 Now we will be focusing on deploying the docker image in a K8s cluster. For this, we will be using the Deployment object of K8s to create Pods that run our image.
 
-Now we will be focusing on deploying the app in our K8s cluster. For this, we first need to create a Persistent volume object that will store data of our MongoDB.
+Now we will be focusing on deploying the app in our K8s cluster. For this, we'll be creating a Persistent volume object that will store data of our MongoDB.
 
 # PART 2
 
@@ -194,7 +189,7 @@ Persistent Volumes are storage resources in a cluster, decoupled from Pods, and 
 They can be provisioned from physical disks or cloud storage services.
 PVs can be dynamically or statically provisioned.
 
-Step 4: Creating a Persistent Volume Manifest for K8s
+## Step 4: Creating a Persistent Volume Manifest for K8s
 You can view the mongo-pv.yml file present in GitHub or copy the YAML from here:
 ```
 apiVersion: v1
@@ -219,6 +214,10 @@ You need to replace the value of the key path in the above YAML to point to a fo
 Create the persistent volume in your cluster using the command kubectl apply -f mongo-pv.yml, then run kubectl get pv to see the volumes available.
 
 You should see an output like this:
+
+
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/d60a9217-386a-4c7a-ba94-6f2d64ce196b)
+
 
 7. Persistent Volume Claim (PVC):
 
@@ -246,6 +245,9 @@ We are requesting a 256Mi volume with access mode as ReadWriteOnce, similar to w
 Create the persistent volume in your cluster using the command kubectl apply -f mongo-pvc.yml, then run kubectl get pvc & kubectl get pv to see the PVC and the volume state.
 
 You should see an output like this:
+
+
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/bf882725-27b5-4c37-b5b5-8919d7470b6f)
 
 The persistent volume is now bound to the persistent volume claim policy as expected, Now let’s use this PVC in the deployment of MongoDB to allow it to store data.
 
@@ -287,6 +289,10 @@ Create the deployment in your cluster using the command kubectl apply -f mongo.y
 
 The output should look like this:
 
+
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/9812bd25-5fb7-4d15-bf3b-668c91e8d82e)
+
+
 Step 6: Create a Service Manifest file of MongoDB
 You can view the mongo-svc.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
@@ -304,9 +310,17 @@ spec:
   selector:
     app: mongo
 ```
-Create the service in your cluster using the command kubectl apply -f mongo-svc.yml and then run kubectl get svc after a few seconds to make sure that the service is ready.
+Create the service in your cluster using the command `kubectl apply -f mongo-svc.yml` and then run `kubectl get svc` after a few seconds to make sure that the service is ready.
+
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/0bedeaba-5fa7-4556-9314-5a2c07eb2286)
+
 
 Step 9: Test the Application
+
+**Make sure to open port 5000 & 30007 in the Deployment Server of the security group**
+
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/aef315ff-9440-42aa-8c76-b1633b3892c8)
+
 You can now test the application by using the curl command given below, make sure to replace 192.168.0.159 with your node’s/service’s IP based on the cluster you are using.
 ```
 curl 192.168.0.159:30007
