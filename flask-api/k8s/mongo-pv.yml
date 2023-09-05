@@ -2,10 +2,13 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongo-pv
+  namespace: flask
 spec:
   capacity:
     storage: 256Mi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: /tmp/db
+    path: /tmp/db/mongodb

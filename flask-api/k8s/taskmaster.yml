@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: taskmaster
+  namespace: flask
   labels:
     app: taskmaster
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: taskmaster
-          image: trainwithshubham/taskmaster-python:latest
+          image: rajlaxmii/microservicesflask:latest
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
