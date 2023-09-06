@@ -2,7 +2,7 @@
 
 Microservices architecture has become increasingly popular in modern software development due to its ability to break down complex applications into smaller, more manageable components 
 
-In this project guide, We'll deploy a two-tier application that combines the power of a Flask Python backend with a MongoDB database—all within the Kubernetes ecosystem, We will also be using Persistent Volumes (PV) and Persistent Volume Claim (PVC) while doing this project.
+In this project guide, We'll deploy a **two-tier application that combines the power of a Flask Python backend with a MongoDB database** all within the Kubernetes ecosystem, We will also be using **Persistent Volumes (PV) and Persistent Volume Claim (PVC)** while doing this project.
 
 In the first part, we'll be setting up:
 
