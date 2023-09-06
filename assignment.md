@@ -1,7 +1,20 @@
 # Deploying Microservices: A Guide to Persistent Volumes in Kubernetes
 
 Microservices architecture has become increasingly popular in modern software development due to its ability to break down complex applications into smaller, more manageable components 
+
 In this project guide, We'll deploy a two-tier application that combines the power of a Flask Python backend with a MongoDB database—all within the Kubernetes ecosystem, We will also be using Persistent Volumes (PV) and Persistent Volume Claim (PVC) while doing this project.
+
+In the first part, we'll be setting up:
+
+In the **first part**, we'll be setting up:
+- Launching the EC2 instance with 't2.medium' type
+- Minikube & Docker on Ubuntu 
+- Build the Docker image
+- Push it to docker hub
+  
+In the **2nd part**, 
+- We'll deploy app using K8s
+- We'll configure various manifest files like deployment.yml, service.yml, persistentVolume.yml, persistentVolumeClaim.yml
 
 But, before we begin this excitingMicroservice deployment journey, let's make sure you meet the following prerequisites:
 ## Prerequisites
@@ -88,6 +101,7 @@ After building the image, we need to push it to docker hub, our Kubernetes deplo
 
 
 Congrats on reaching here! 🥳 You have now successfully built a docker image and uploaded it to Docker Hub, thus completing the basic steps of the continuous integration Process.
+
 Now we will be focusing on deploying the docker image in a K8s cluster. For this, we will be using the Deployment object of K8s to create Pods that run our image.
 
 Now we will be focusing on deploying the app in our K8s cluster. For this, we'll be creating a Persistent volume object that will store data of our MongoDB.
@@ -115,6 +129,7 @@ Pods can contain one or more containers, and  are used to deploy applications, a
  - They ensure a specified number of replicas are running and provide updates and rollbacks for application changes.
 
 ## Step 1: Creating a Deployment Manifest File of the Flask App
+You can view the `taskmaster.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -142,11 +157,14 @@ spec:
 ```
 Make sure to replace the value of image key with that of your image name as shown in the YAML file.
 
-Run `kubectl apply -f deployment.yml` to create the deployment object in K8s. You should see an output similar to this:
+Run `kubectl apply -f deployment.yml` to create the deployment object in K8s. 
+
+You should see an output similar to this:
 
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/693cf254-cf79-47d2-a62d-4b63739a2811)
 
-The deployment creates 1 pods running 1 container each with the `rajlaxmii/microservicesflaskapp:latest` image we pushed earlier. The key **containerPort** declares that the container accepts connections from port 5000.
+- The deployment creates 1 pods running 1 container each with the `rajlaxmii/microservicesflaskapp:latest` image we pushed earlier. 
+- The key **containerPort** declares that the container accepts connections from port 5000.
 
 Run `kubectl get deployment -n flask` and `kubectl get pods -n flask` to ensure that your deployment has been successfully created and pods are running. 
 
@@ -166,7 +184,7 @@ Our next step is to create a service object that will allow us to connect to the
 - There are different types of Services, including ClusterIP, NodePort, and LoadBalancer.
 
 ## Step 2: Create the Service manifest File of the Flask App
-You can view the taskmaster-svc.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
+You can view the `taskmaster-svc.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 
 ```
 apiVersion: v1
@@ -183,7 +201,9 @@ spec:
       nodePort: 30007
   type: NodePort
 ```
-Run kubectl apply -f taskmaster-svc.yml to create this service in K8s. Run kubectl get svc to check if the service has been created, the output should look like this:
+Run `kubectl apply -f taskmaster-svc.yml` to create this service in K8s. Run `kubectl get svc` to check if the service has been created.
+
+The output should look like this:
 
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/b1cd8974-3b04-4c8d-a010-eb041a4fe89b)
 
@@ -194,7 +214,7 @@ They can be provisioned from physical disks or cloud storage services.
 PVs can be dynamically or statically provisioned.
 
 ## Step 3: Creating a Persistent Volume Manifest for K8s
-You can view the mongo-pv.yml file present in GitHub or copy the YAML from here:
+You can view the `mongo-pv.yml` file present in GitHub or copy the YAML from here:
 ```
 apiVersion: v1
 kind: PersistentVolume
@@ -211,11 +231,11 @@ spec:
   hostPath:
     path: /tmp/db/mongodb
 ```
-We are provisioning a 256Mi persistent volume with Retain policy, which means that the data in this volume will be preserved even if the corresponding persistent volume claim policy has been deleted.
+- We are provisioning a 256Mi persistent volume with Retain policy, which means that the data in this volume will be preserved even if the corresponding persistent volume claim policy has been deleted.
 
-You need to replace the value of the key path in the above YAML to point to a folder present in the node. In my case, I have already created a folder mongodata in the given path.
+- You need to replace the value of the key path in the above YAML to point to a folder present in the node. In my case, I have already created a folder mongodata in the given path.
 
-Create the persistent volume in your cluster using the command `kubectl apply -f mongo-pv.yml`, then run `kubectl get pv` to see the volumes available.
+Create the persistent volume in your cluster using the command `kubectl apply -f mongo-pv.yml` , then run `kubectl get pv` to see the volumes available.
 
 You should see an output like this:
 
@@ -242,7 +262,7 @@ spec:
     requests:
       storage: 256Mi
 ```
-We are requesting a 256Mi volume with access mode as ReadWriteOnce, similar to what we have in the persistent volume we created above.
+- We are requesting a 256Mi volume with access mode as ReadWriteOnce, similar to what we have in the persistent volume we created above.
 
 Create the persistent volume in your cluster using the command `kubectl apply -f mongo-pvc.yml`, then run `kubectl get pvc -n flask` & `kubectl get pv -n flask` to see the PVC and the volume state.
 
@@ -284,7 +304,7 @@ spec:
           persistentVolumeClaim:
             claimName: mongo-pvc
 ```
-Notice the key spec.template.spec.containers.volumeMounts where we ask Kubernetes to mount the volume to mount path /data/db, this is the path where Mongo db stores its data. We also declare the PVC that the containers will use while claiming data under spec.template.spec.volumes
+- Notice the key spec.template.spec.containers.volumeMounts where we ask Kubernetes to mount the volume to mount path /data/db, this is the path where Mongo db stores its data. We also declare the PVC that the containers will use while claiming data under spec.template.spec.volumes
 
 Create the deployment in your cluster using the command `kubectl apply -f mongo.yml` and then run `kubectl get deployment -n flask` after a few seconds to make sure that the pod(s) are ready.
 
@@ -326,20 +346,20 @@ Get the url for your application using :
 ```
 minikube service list
 
-``
+```
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/2911b627-96a9-4ebf-8f24-f2f5468c9d32)
 
-You can now test the application by using the curl command with the url you got above, make sure to replace `192.168.0.159` with your ip
+**You can now test the application by using the curl command with the url you got above, make sure to replace `192.168.49.2` with your ip**
 ```
 curl 192.168.49.2:30007
 ```
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/5f7c72e0-eb6d-4bdf-8329-96198c97c428)
 
-Test MongoDB:
+## Test MongoDB:
 
 You can test if the application is working by trying to insert and then fetch data from the DB using the flask app requests GET /tasks and POST /task.
 
-GET /tasks :
+**GET /tasks :**
 ```
 curl 192.168.49.2:30007/tasks
 ```
@@ -347,7 +367,7 @@ curl 192.168.49.2:30007/tasks
 
 The output would be like this considering this is the first time you have run this app and haven’t inserted any data yet:
 
-Insert Data to MongoDB using POST /task path and then get all data using GET /tasks path:
+**Insert Data to MongoDB using POST /task path and then get all data using GET /tasks path:**
 ```
 curl -X POST -H "Content-Type: application/json" -d '{"task":"Show everyone the project"}' http://192.168.49.2:30007/task
 curl 192.168.49.2:30007/tasks
