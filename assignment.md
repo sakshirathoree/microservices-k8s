@@ -58,7 +58,7 @@ https://github.com/sakshirathoree/microservices-k8s.git
 ```
 
 ## Step 4: Move to the project directory & Build the Dockerfile
-The project folder includes a Dockerfile that will be used to build the image.
+The project folder includes a **Dockerfile** that will be used to build the image.
 
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/d21eeede-54bf-4a03-a849-5aee1b9b4564)
 
@@ -75,7 +75,7 @@ ENTRYPOINT [ "python" ]
 CMD [ "app.py" ]
 
 ```
-Run the below-given commands inside the root of the project folder to build the docker image, and replace the placeholder <username> with your DockerHub username.
+Run the below-given commands inside the root of the project folder to build the docker image, and **replace the placeholder <username> with your DockerHub username.**
 ```
 docker build --rm -t <username>/microservicesflaskapp:latest .
 ```
@@ -111,7 +111,7 @@ Now we will be focusing on deploying the app in our K8s cluster. For this, we'll
  Before we begin with our deployment, Let's first create the `namespace` 
 
  ##  What is namespace?
- - namespace is a logical entity that allows you to isolate resources like pods, volumes, deployments etc. It's a way to logically partition or segregate resources within a cluster.
+ - **namespace** is a logical entity that allows you to isolate resources like pods, volumes, deployments etc. It's a way to logically partition or segregate resources within a cluster.
  - **Resource Isolation:** Namespaces help isolate resources, preventing naming conflicts between objects like Pods, Services, ConfigMaps, and more. This separation enhances security and resource management.
  - **Organization:** Namespaces enable logical organization and categorization of resources. You can group related objects and apply policies at the namespace level.
 
@@ -123,7 +123,7 @@ kubectl create namespace flask
 
 
  ##  What is Deployment?
- - Deployment in k8s is a controller which helps your applications reach the desired state, the desired state is defined inside the deployment.yml file
+ - **Deployment** in k8s is a controller which helps your applications reach the desired state, the desired state is defined inside the deployment.yml file
  - Deployments are used to manage and scale the replica sets of Pods(A Pod is the smallest deployable unit in Kubernetes, representing a single instance of a running process.
 Pods can contain one or more containers, and  are used to deploy applications, and each Pod has its own unique IP address within the cluster)
  - They ensure a specified number of replicas are running and provide updates and rollbacks for application changes.
@@ -155,7 +155,7 @@ spec:
             - containerPort: 5000
           imagePullPolicy: Always
 ```
-Make sure to replace the value of image key with that of your image name as shown in the YAML file.
+**Make sure to replace the value of image key with that of your image name as shown in the YAML file.**
 
 Run `kubectl apply -f deployment.yml` to create the deployment object in K8s. 
 
@@ -178,7 +178,7 @@ Your output should look like this:
 Our next step is to create a service object that will allow us to connect to the pods created by the deployment file.
 
 ##  What is Service?
-- A Service in K8s serves as a link between distinct pods or microservices inside a cluster.
+- A **Service** in K8s serves as a link between distinct pods or microservices inside a cluster.
 - It provide network access to a set of Pods, allowing them to be accessed by other Pods or external clients.
 - They can be used for load balancing, service discovery, and routing network traffic.
 - There are different types of Services, including ClusterIP, NodePort, and LoadBalancer.
@@ -208,9 +208,9 @@ The output should look like this:
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/b1cd8974-3b04-4c8d-a010-eb041a4fe89b)
 
 ##  What are Persistent Volumes?
-Persistent Volumes are storage resources in a cluster, decoupled from Pods, and provide a way to manage storage.
-They ensure that even if your applications or containers change or restart, your valuable data remains safe and accessible. PVs are essential for preserving your database information within the Kubernetes environment.
-They can be provisioned from physical disks or cloud storage services.
+- **Persistent Volumes** are storage resources in a cluster, decoupled from Pods, and provide a way to manage storage.
+- They ensure that even if your applications or containers change or restart, your valuable data remains safe and accessible. PVs are essential for preserving your database information within the Kubernetes environment.
+- They can be provisioned from physical disks or cloud storage services.
 PVs can be dynamically or statically provisioned.
 
 ## Step 3: Creating a Persistent Volume Manifest for K8s
@@ -243,9 +243,9 @@ You should see an output like this:
 
 
 ##  What are Persistent Volume Claim (PVC)?
-Persistent Volume Claims are requests for storage by Pods.
-They allow Pods to consume storage resources from PVs.
-PVCs provide a way to abstract the underlying storage details from the application.
+- **Persistent Volume Claims** are requests for storage by Pods.
+- They allow Pods to consume storage resources from PVs.
+- PVCs provide a way to abstract the underlying storage details from the application.
 
 ## Step 4: Creating a Persistent Volume Claim (PVC) Manifest in K8s
 You can view the `mongo-pvc.yml` file present in GitHub or copy the YAML from here:
@@ -272,7 +272,7 @@ You should see an output like this:
 
 The persistent volume is now bound to the persistent volume claim policy as expected, Now let’s use this PVC in the deployment of MongoDB to allow it to store data.
 
-## Step 4: Create a Deployment Manifest file of MongoDB
+## Step 5: Create a Deployment Manifest file of MongoDB
 You can view the `mongo.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: apps/v1
@@ -313,7 +313,7 @@ The output should look like this:
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/4c338877-f211-42e8-a450-70cdb5094825)
 
 
-## Step 5: Create a Service Manifest file of MongoDB
+## Step 6: Create a Service Manifest file of MongoDB
 You can view the `mongo-svc.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: v1
@@ -335,7 +335,7 @@ Create the service in your cluster using the command `kubectl apply -f mongo-svc
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/9c02838e-44b0-4cda-b029-80e8bf324ca6)
 
 
-## Step 6: Test the Application
+## Step 7: Test the Application
 
 **Make sure to open port 5000 & 30007 in the Deployment Server of the security group**
 
@@ -355,7 +355,7 @@ curl 192.168.49.2:30007
 ```
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/5f7c72e0-eb6d-4bdf-8329-96198c97c428)
 
-## Test MongoDB:
+## Step 8: Test Test MongoDB:
 
 You can test if the application is working by trying to insert and then fetch data from the DB using the flask app requests GET /tasks and POST /task.
 
