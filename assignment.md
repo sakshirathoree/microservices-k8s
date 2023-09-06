@@ -135,7 +135,7 @@ spec:
     spec:
       containers:
         - name: taskmaster
-          image: rajlaxmii/microservicesflask:latest
+          image: rajlaxmii/microservicesflaskapp:latest
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
@@ -144,15 +144,16 @@ Make sure to replace the value of image key with that of your image name as show
 
 Run `kubectl apply -f deployment.yml` to create the deployment object in K8s. You should see an output similar to this:
 
-![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/b74cc0c1-b8b2-436d-86ad-7a33ae017d01)
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/693cf254-cf79-47d2-a62d-4b63739a2811)
 
-The deployment creates 1 pods running 1 container each with the `rajlaxmii/microservicespythonapp:latest` image we pushed earlier. The key **containerPort** declares that the container accepts connections from port 5000.
+The deployment creates 1 pods running 1 container each with the `rajlaxmii/microservicesflaskapp:latest` image we pushed earlier. The key **containerPort** declares that the container accepts connections from port 5000.
 
 Run `kubectl get deployment -n flask` and `kubectl get pods -n flask` to ensure that your deployment has been successfully created and pods are running. 
 
 Your output should look like this:
 
-![image](https://github.com/sakshirathoree/reddit-clone-k8s-ingress/assets/67737704/44e5a924-7f43-494e-99cb-f7ad892d6edc)
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/c50e0963-dbee-4038-8bd7-cc7c9c4edb50)
+
 
 **Don't forget to specify namespace using -n else it'll consider the default namespace & will not show any resources**
 
@@ -164,7 +165,7 @@ Our next step is to create a service object that will allow us to connect to the
 - They can be used for load balancing, service discovery, and routing network traffic.
 - There are different types of Services, including ClusterIP, NodePort, and LoadBalancer.
 
-Step 8: Create the Service manifest File of the Flask App
+## Step 2: Create the Service manifest File of the Flask App
 You can view the taskmaster-svc.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
 
 ```
@@ -184,12 +185,15 @@ spec:
 ```
 Run kubectl apply -f taskmaster-svc.yml to create this service in K8s. Run kubectl get svc to check if the service has been created, the output should look like this:
 
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/b1cd8974-3b04-4c8d-a010-eb041a4fe89b)
+
+##  What are Persistent Volumes?
 Persistent Volumes are storage resources in a cluster, decoupled from Pods, and provide a way to manage storage.
- They ensure that even if your applications or containers change or restart, your valuable data remains safe and accessible. PVs are essential for preserving your database information within the Kubernetes environment.
+They ensure that even if your applications or containers change or restart, your valuable data remains safe and accessible. PVs are essential for preserving your database information within the Kubernetes environment.
 They can be provisioned from physical disks or cloud storage services.
 PVs can be dynamically or statically provisioned.
 
-## Step 4: Creating a Persistent Volume Manifest for K8s
+## Step 3: Creating a Persistent Volume Manifest for K8s
 You can view the mongo-pv.yml file present in GitHub or copy the YAML from here:
 ```
 apiVersion: v1
@@ -215,17 +219,16 @@ Create the persistent volume in your cluster using the command kubectl apply -f 
 
 You should see an output like this:
 
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/8cdb8555-abda-495b-8377-117b5cedaba1)
 
-![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/d60a9217-386a-4c7a-ba94-6f2d64ce196b)
 
-
-7. Persistent Volume Claim (PVC):
+##  What are Persistent Volume Claim (PVC)?
 
 Persistent Volume Claims are requests for storage by Pods.
 They allow Pods to consume storage resources from PVs.
 PVCs provide a way to abstract the underlying storage details from the application.
 
-Step 5: Creating a Persistent Volume Claim (PVC) Manifest in K8s
+## Step 4: Creating a Persistent Volume Claim (PVC) Manifest in K8s
 You can view the mongo-pvc.yml file present in GitHub or copy the YAML from here:
 ```
 apiVersion: v1
@@ -242,16 +245,15 @@ spec:
 ```
 We are requesting a 256Mi volume with access mode as ReadWriteOnce, similar to what we have in the persistent volume we created above.
 
-Create the persistent volume in your cluster using the command kubectl apply -f mongo-pvc.yml, then run kubectl get pvc & kubectl get pv to see the PVC and the volume state.
+Create the persistent volume in your cluster using the command `kubectl apply -f mongo-pvc.yml`, then run `kubectl get pvc -n flask` & `kubectl get pv -n flask` to see the PVC and the volume state.
 
 You should see an output like this:
 
-
-![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/bf882725-27b5-4c37-b5b5-8919d7470b6f)
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/eef57cde-07d7-41c9-ac4a-79089b33f00a)
 
 The persistent volume is now bound to the persistent volume claim policy as expected, Now let’s use this PVC in the deployment of MongoDB to allow it to store data.
 
-Step 6: Create a Deployment Manifest file of MongoDB
+## Step 4: Create a Deployment Manifest file of MongoDB
 You can view the mongo.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: apps/v1
@@ -285,16 +287,15 @@ spec:
 ```
 Notice the key spec.template.spec.containers.volumeMounts where we ask Kubernetes to mount the volume to mount path /data/db, this is the path where Mongo db stores its data. We also declare the PVC that the containers will use while claiming data under spec.template.spec.volumes
 
-Create the deployment in your cluster using the command kubectl apply -f mongo.yml and then run kubectl get deployment after a few seconds to make sure that the pod(s) are ready.
+Create the deployment in your cluster using the command `kubectl apply -f mongo.yml` and then run `kubectl get deployment -n flask` after a few seconds to make sure that the pod(s) are ready.
 
 The output should look like this:
 
-
-![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/9812bd25-5fb7-4d15-bf3b-668c91e8d82e)
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/4c338877-f211-42e8-a450-70cdb5094825)
 
 
 Step 6: Create a Service Manifest file of MongoDB
-You can view the mongo-svc.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
+You can view the `mongo-svc.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: v1
 kind: Service
@@ -310,9 +311,9 @@ spec:
   selector:
     app: mongo
 ```
-Create the service in your cluster using the command `kubectl apply -f mongo-svc.yml` and then run `kubectl get svc` after a few seconds to make sure that the service is ready.
+Create the service in your cluster using the command `kubectl apply -f mongo-svc.yml` and then run `kubectl get svc -n flask` after a few seconds to make sure that the service is ready.
 
-![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/0bedeaba-5fa7-4556-9314-5a2c07eb2286)
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/9c02838e-44b0-4cda-b029-80e8bf324ca6)
 
 
 Step 9: Test the Application
