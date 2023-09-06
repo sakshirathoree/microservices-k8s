@@ -215,7 +215,7 @@ We are provisioning a 256Mi persistent volume with Retain policy, which means th
 
 You need to replace the value of the key path in the above YAML to point to a folder present in the node. In my case, I have already created a folder mongodata in the given path.
 
-Create the persistent volume in your cluster using the command kubectl apply -f mongo-pv.yml, then run kubectl get pv to see the volumes available.
+Create the persistent volume in your cluster using the command `kubectl apply -f mongo-pv.yml`, then run `kubectl get pv` to see the volumes available.
 
 You should see an output like this:
 
@@ -223,13 +223,12 @@ You should see an output like this:
 
 
 ##  What are Persistent Volume Claim (PVC)?
-
 Persistent Volume Claims are requests for storage by Pods.
 They allow Pods to consume storage resources from PVs.
 PVCs provide a way to abstract the underlying storage details from the application.
 
 ## Step 4: Creating a Persistent Volume Claim (PVC) Manifest in K8s
-You can view the mongo-pvc.yml file present in GitHub or copy the YAML from here:
+You can view the `mongo-pvc.yml` file present in GitHub or copy the YAML from here:
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -254,7 +253,7 @@ You should see an output like this:
 The persistent volume is now bound to the persistent volume claim policy as expected, Now let’s use this PVC in the deployment of MongoDB to allow it to store data.
 
 ## Step 4: Create a Deployment Manifest file of MongoDB
-You can view the mongo.yml file present in GitHub or copy the YAML from here, create a file and then apply it.
+You can view the `mongo.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -294,7 +293,7 @@ The output should look like this:
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/4c338877-f211-42e8-a450-70cdb5094825)
 
 
-Step 6: Create a Service Manifest file of MongoDB
+## Step 5: Create a Service Manifest file of MongoDB
 You can view the `mongo-svc.yml` file present in GitHub or copy the YAML from here, create a file and then apply it.
 ```
 apiVersion: v1
@@ -316,16 +315,25 @@ Create the service in your cluster using the command `kubectl apply -f mongo-svc
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/9c02838e-44b0-4cda-b029-80e8bf324ca6)
 
 
-Step 9: Test the Application
+## Step 6: Test the Application
 
 **Make sure to open port 5000 & 30007 in the Deployment Server of the security group**
 
 ![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/aef315ff-9440-42aa-8c76-b1633b3892c8)
 
-You can now test the application by using the curl command given below, make sure to replace 192.168.0.159 with your node’s/service’s IP based on the cluster you are using.
+###  To get the URL for your application:
+Get the url for your application using :
 ```
-curl 192.168.0.159:30007
+minikube service list
+
+``
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/2911b627-96a9-4ebf-8f24-f2f5468c9d32)
+
+You can now test the application by using the curl command with the url you got above, make sure to replace `192.168.0.159` with your ip
 ```
+curl 192.168.49.2:30007
+```
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/5f7c72e0-eb6d-4bdf-8329-96198c97c428)
 
 Test MongoDB:
 
@@ -333,18 +341,23 @@ You can test if the application is working by trying to insert and then fetch da
 
 GET /tasks :
 ```
-curl 192.168.0.159:30007/tasks
+curl 192.168.49.2:30007/tasks
 ```
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/02c1c3b1-227d-4f17-8a03-7e58ef465fa4)
+
 The output would be like this considering this is the first time you have run this app and haven’t inserted any data yet:
 
 Insert Data to MongoDB using POST /task path and then get all data using GET /tasks path:
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"task":"Show everyone the project"}' http://192.168.0.159:30007/task
-curl 192.168.0.159:30007/tasks
+curl -X POST -H "Content-Type: application/json" -d '{"task":"Show everyone the project"}' http://192.168.49.2:30007/task
+curl 192.168.49.2:30007/tasks
 ```
 The output will be like this:
-Let’s check if the database has populated the volume hostPath folder that we declared in mongo-pv.yml under spec.hostpath.path, In my case, it was /home/node/mongodata
 
-As expected, the given folder path contains data from MongoDB.
+![image](https://github.com/sakshirathoree/microservices-k8s/assets/67737704/3477190d-0c67-41b6-b3e6-094ae5290cf8)
 
-Congratulations on Your Microservices Project! 
+
+## Congratulations on Your Microservices Project!
+
+If you've any queries, feel free to reach me on LinkedIn:
+https://www.linkedin.com/in/rajlaxmi-rathore29/
